@@ -1,0 +1,169 @@
+package com.pack1;
+// task 1 :Retrive employe details/
+// task 2 : Ask the user to enter emp data and insert the data into employee table
+// task 3 : ask the user to enter eid and retrivr that employee record from the database
+//          if the Record is not avilable display that msg in the console including empid
+// task 4 : Ask the user to enter eid and delete that msg in the console encluding EMPid
+// task 5 : Ask the user to enter Eid and esal and update the record in the table accoridingly
+//          if the record Not available display that msg in the console including empid
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+public class Jdbcpro3 {
+	String driver = "oracle.jdbc.OracleDriver";
+	String dburl = "jdbc:oracle:thin:@localhost:1521:orcl";
+	String dbUname = "DAMERA";
+	String dbUpwd = "ENJOY";
+	String Quary1 = "SELECT * FROM EMPLOYEE";
+	
+	Connection connect() {
+		Connection con = null;
+		try {
+			Class.forName(driver);
+			con=DriverManager.getConnection(dburl, dbUname, dbUpwd);
+			
+			
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+		return con;
+	}
+
+//	---------Retrive employe details-------------
+	
+	void Retrive() {
+		try {
+			Connection con = connect();
+			System.out.println("connected succesfully");
+			Statement stat = con.createStatement();
+			ResultSet rs = stat.executeQuery(Quary1);
+			while(rs.next()) {
+   			 System.out.println(rs.getString(1)+" "+rs.getString(2)+" "+rs.getString(3)+" "+rs.getInt(4)+" "+rs.getString(5));
+		}
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+//	-----------Inserting the data employee --------------
+	
+	void insertEmployee() {
+			String eid = IO.readln("Enter Eid to insert :");
+			String fname = IO.readln("Enter First Name: ");
+			String lname = IO.readln("Enter last Name :");
+			int sal = Integer.parseInt(IO.readln("Enter salary :"));
+			
+			String Eadd = IO.readln("Enter last Eaddress :");
+			
+			try {
+			String Quary2 = "INSERT INTO EMPLOYEE VALUES('"+eid+"','"+fname+"','"+lname+"',"+sal+",'"+Eadd+"')";
+			Connection con = connect();
+			Statement stat = con.createStatement();
+			int row = stat.executeUpdate(Quary2);
+			if(row>0) {
+			IO.println(" data inserted succefully");
+			}
+			else {
+				IO.println("check the query incorrect");
+			}
+			stat.close();
+			con.close();
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+//	---------Searching id ----------------------------
+	
+	void getEmployeeId() {
+			String eid = IO.readln("Enter the id to search :");
+			String Quary3 = "SELECT * FROM EMPLOYEE WHERE EID = '"+eid+"'";
+			
+			try {
+			Connection con = connect();
+			Statement stat = con.createStatement();
+			ResultSet row = stat.executeQuery(Quary3);
+			if(row.next()) 
+			{
+				System.out.println(row.getString(1)+" "+row.getString(2)+" "+row.getString(3)+" "+row.getInt(4)+" "+row.getString(5));
+				
+			}
+			else {
+				IO.println("Employee record not available for EID: " + eid);
+			}
+			
+		}
+		catch (Exception e){
+			e.printStackTrace();
+		}
+	}
+//	----------Deleting the record based on id------------
+	
+	void deleteEmployeeData() {
+		String eid = IO.readln("Enter the id to delete :");
+		String Quary4 = "DELETE FROM EMPLOYEE WHERE EID = '"+eid+"'";
+		try {
+		Connection con = connect();
+		Statement stat = con.createStatement();
+		int row = stat.executeUpdate(Quary4);
+		
+		if(row>0) {
+			IO.println("Employee deleted successfully. EID: " + eid);
+		}else {
+			IO.println("Employee record not available for EID: " + eid);
+		}
+		
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+	}
+//	-------------Updating the salary based on employee id------------------
+	
+	void UpdateEmploeedata() {
+		String eid = IO.readln("Enter the id to update");
+		int sal = Integer.parseInt(IO.readln("Enter the salry of employee"));
+		String Query5 = "UPDATE EMPLOYEE SET ESAL=" + sal + " WHERE EID=" + eid+"";
+		try {
+			Connection con = connect();
+			Statement stat = con.createStatement();
+			int row = stat.executeUpdate(Query5);
+			if(row>0) {
+				IO.println("Salary updated for EID: " + eid+"");
+			}else {
+				IO.println("Employee record not available for EID: " + eid);
+			}
+			
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+//  ----------------------main method------------------
+	
+	public static void main(String[] args) {
+	Jdbcpro3 jr = new Jdbcpro3();
+	jr.Retrive();
+	jr.insertEmployee();
+	jr.getEmployeeId();
+	jr.deleteEmployeeData();
+	jr.UpdateEmploeedata();
+	
+	}
+}
+
+
+
+
+
+
+
+
+

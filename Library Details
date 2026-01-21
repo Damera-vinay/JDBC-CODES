@@ -1,0 +1,140 @@
+package com.pack1;
+import java.sql.*;
+import java.util.Scanner;
+
+public class Jdbcpro40 {
+
+	public class LibraryManager {
+	    static Connection con;
+	    static Scanner sc = new Scanner(System.in);
+
+	    public static void main(String[] args) {
+	        try {
+	            // Load driver and establish connection
+	            Class.forName("com.mysql.cj.jdbc.Driver");
+	            con = DriverManager.getConnection("jdbc:mysql://localhost:3306/yourDB", "username", "password");
+
+	            while (true) {
+	                System.out.println("\nWelcome to Library management");
+	                System.out.println("Choose your Options");
+	                System.out.println("1. Add Book to the Library");
+	                System.out.println("2. Retrieving Specific Book");
+	                System.out.println("3. Deleting Specific Book");
+	                System.out.println("4. View All the Books");
+	                System.out.println("5. Exit");
+
+	                try {
+	                    int choice = Integer.parseInt(sc.nextLine());
+
+	                    switch (choice) {
+	                        case 1:
+	                            addBook();
+	                            break;
+	                        case 2:
+	                            retrieveBook();
+	                            break;
+	                        case 3:
+	                            deleteBook();
+	                            break;
+	                        case 4:
+	                            viewAllBooks();
+	                            break;
+	                        case 5:
+	                            System.out.println("Thank you, see you soon :)");
+	                            con.close();
+	                            System.exit(0);
+	                        default:
+	                            System.out.println("Invalid choice. Please select between 1 to 5.");
+	                    }
+	                } catch (NumberFormatException e) {
+	                    System.out.println("Please enter a valid number.");
+	                }
+	            }
+	        } catch (Exception e) {
+	            System.out.println("Connection failed: " + e.getMessage());
+	        }
+	    }
+
+	    static void addBook() {
+	        try {
+	            System.out.print("Enter Book ID: ");
+	            int id = Integer.parseInt(sc.nextLine());
+	            System.out.print("Enter Book Name: ");
+	            String name = sc.nextLine();
+	            System.out.print("Enter Author: ");
+	            String author = sc.nextLine();
+	            System.out.print("Enter Genre: ");
+	            String genre = sc.nextLine();
+	            System.out.print("Enter Book Cost: ");
+	            double cost = Double.parseDouble(sc.nextLine());
+
+	            PreparedStatement ps = con.prepareStatement("INSERT INTO Library VALUES (?, ?, ?, ?, ?)");
+	            ps.setInt(1, id);
+	            ps.setString(2, name);
+	            ps.setString(3, author);
+	            ps.setString(4, genre);
+	            ps.setDouble(5, cost);
+
+	            int rows = ps.executeUpdate();
+	            System.out.println(rows > 0 ? "Book added successfully!" : "Failed to add book.");
+	        } catch (Exception e) {
+	            System.out.println("Error adding book: " + e.getMessage());
+	        }
+	    }
+
+	    static void retrieveBook() {
+	        try {
+	            System.out.print("Enter Book ID to retrieve: ");
+	            int id = Integer.parseInt(sc.nextLine());
+
+	            PreparedStatement ps = con.prepareStatement("SELECT * FROM Library WHERE bookId = ?");
+	            ps.setInt(1, id);
+	            ResultSet rs = ps.executeQuery();
+
+	            if (rs.next()) {
+	                System.out.println("Book ID: " + rs.getInt("bookId"));
+	                System.out.println("Name: " + rs.getString("bookName"));
+	                System.out.println("Author: " + rs.getString("author"));
+	                System.out.println("Genre: " + rs.getString("genre"));
+	                System.out.println("Cost: " + rs.getDouble("bookCost"));
+	            } else {
+	                System.out.println("Book not found.");
+	            }
+	        } catch (Exception e) {
+	            System.out.println("Error retrieving book: " + e.getMessage());
+	        }
+	    }
+
+	    static void deleteBook() {
+	        try {
+	            System.out.print("Enter Book ID to delete: ");
+	            int id = Integer.parseInt(sc.nextLine());
+
+	            PreparedStatement ps = con.prepareStatement("DELETE FROM Library WHERE bookId = ?");
+	            ps.setInt(1, id);
+	            int rows = ps.executeUpdate();
+
+	            System.out.println(rows > 0 ? "Book deleted successfully!" : "Book not found.");
+	        } catch (Exception e) {
+	            System.out.println("Error deleting book: " + e.getMessage());
+	        }
+	    }
+
+	    static void viewAllBooks() {
+	        try {
+	            Statement st = con.createStatement();
+	            ResultSet rs = st.executeQuery("SELECT * FROM Library");
+
+	            while (rs.next()) {
+	                System.out.println("\nBook ID: " + rs.getInt("bookId"));
+	                System.out.println("Name: " + rs.getString("bookName"));
+	                System.out.println("Author: " + rs.getString("author"));
+	                System.out.println("Genre: " + rs.getString("genre"));
+	                System.out.println("Cost: " + rs.getDouble("bookCost"));
+	            }
+	        } catch (Exception e) {
+	            System.out.println("Error viewing books: " + e.getMessage());
+	        }
+	    }
+	}
+}

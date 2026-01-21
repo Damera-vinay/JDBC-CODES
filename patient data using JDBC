@@ -1,0 +1,169 @@
+package com.pack1;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLIntegrityConstraintViolationException;
+import java.util.Scanner;
+
+//import javax.management.RuntimeErrorException;
+
+public class Jdbcpro5 {
+	String driver = "oracle.jdbc.OracleDriver";
+	String dburl = "jdbc:oracle:thin:@localhost:1521:orcl";
+	String dbUname = "DAMERA";
+	String dbUpwd = "ENJOY";
+	
+	Scanner sc = new Scanner(System.in);
+	
+	Connection connet() {
+		Connection con = null;
+		try {
+			Class.forName(driver);
+			con=DriverManager.getConnection(dburl, dbUname, dbUpwd);
+			
+			
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		return con;
+		
+	}
+	
+	
+    public void patientOPeration() {
+    	try {
+    		Connection con = connet();
+    		PreparedStatement stat1= con.prepareStatement("Insert into PATIENT VALUES(?,?,?,?)");
+    		PreparedStatement stat2= con.prepareStatement("SELECT * FROM PATIENT");
+    		PreparedStatement stat3= con.prepareStatement("select * from patient where pid = ? ");
+    		PreparedStatement stat4= con.prepareStatement("update patient set age = ? where pid = ?");
+    		PreparedStatement stat5= con.prepareStatement("delete from patient where pid = ?");
+    		
+    		while(true) {
+    			System.out.println("-------patient data--------");
+    			System.out.println("1. Add patient data");
+    			System.out.println("2. View all patient details");
+    			System.out.println("3. Retrive patient data");
+    			System.out.println("4. Update patient data");
+    			System.out.println("5. Delete patient data");
+    			System.out.println("6. Exit");
+    			
+    			System.out.println("Enter your choice :");
+    			
+				int choice = Integer.parseInt(sc.nextLine());
+				
+				switch(choice) {
+				case 1:
+					System.out.println("Adding patient data");
+//					System.out.println("enter patient Id");
+					String p_id = IO.readln("Enter patient Id");
+					String p_name = IO.readln("Enter patient name");
+					int p_age = Integer.parseInt(IO.readln("Enter patient age"));
+					double p_contact = Double.parseDouble(IO.readln("Enter patient contact"));
+					
+					stat1.setString(1, p_id);
+					stat1.setString(2, p_name);
+					stat1.setInt(3, p_age);
+					stat1.setDouble(4, p_contact);
+					
+					int rowcount1 = stat1.executeUpdate();
+					if(rowcount1>0) {
+						System.out.println("Data insertd");
+						
+					}else {
+//						throw new RuntimeErrorException( "patient data not insertd");
+						System.out.println("patient data not insertd");
+						break;
+					}
+					
+//	    			==========================================================================
+					
+				case 2:
+					System.out.println("2. View all patient details");
+					ResultSet rs = stat2.executeQuery();
+					while(rs.next()) {
+						System.out.println(rs.getString(1)+" "+rs.getString(2)+" "+rs.getString(3)+" "+rs.getString(4));	
+					}
+					System.out.println();
+					break;
+					
+//	    			==========================================================================
+					
+				case 3:
+	    			System.out.println("3. Retrive patient data");
+	    			System.out.println("Enter patient id :");
+	    			String p_id1 = sc.nextLine();
+	    			stat3.setString(1, p_id1);
+	    			
+	    			ResultSet rs1 =stat3.executeQuery();
+	    			if(rs1.next()) {
+	    				System.out.println(rs1.getString(1)+" "+rs1.getString(2)+" "+rs1.getString(3)+" "+rs1.getString(4));	
+	    			}
+	    			else {
+	    				System.out.println("Patient record the "+p_id1+" not found");
+	    			}
+	    			break;
+	    			
+//	    			==========================================================================
+	    		
+				case 4:
+	    			System.out.println("4. Update patient data");
+	    			System.out.println("enter patient id to update :");
+	    			String p_id2 = sc.nextLine();
+	    			System.out.println("enter patient id to update :");
+	    			int p_age4 = Integer.parseInt(sc.nextLine());
+	    			
+	    			stat4.setInt(1, p_age4);
+	    			stat4.setString(2, p_id2);
+	    			
+	    			
+	    			int rs3 = stat4.executeUpdate();
+	    			if(rs3>0) {
+	    				System.out.println("patient record "+rs3+" updated.");
+	    			}else {
+	    				System.out.println("Patient record the "+p_id2+" not found");
+	    			}
+	    			
+	    		    break;
+//	    		    ==============================================================================================
+	    		    
+	    		case 5:
+	    			System.out.println("5. Delete patient data");
+//	    		    System.out.println("Enter patient id to delete :");
+	    		    String p_id6 = IO.readln("Enter patient id to delete :");
+	    		    
+	    		    stat5.setString(1, p_id6);
+	    		    int rowc = stat5.executeUpdate();
+	    		    if(rowc>0) {
+	    		    	System.out.println("patient record "+p_id6+" deleted");
+	    		    }
+	    		    else {
+	    		    	System.out.println("patient record "+p_id6+" not found.");
+	    		    	
+	    		    }
+	    			break;
+	    		case 6:
+	    			System.out.println("6. Exit");
+	    			System.exit(0);
+							
+					
+				}
+    		}
+    	}
+    	catch(SQLIntegrityConstraintViolationException si) {
+    		System.out.println("Duplicates not allowed");
+    	}
+ 
+    	catch (Exception e) {
+		   e.printStackTrace();
+		}
+    
+    }
+    public static void main(String[] args) {
+		Jdbcpro5 pat= new Jdbcpro5();
+		pat.patientOPeration();
+	}
+}

@@ -1,0 +1,86 @@
+package com.pack1;
+import java.awt.Window.Type;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import com.sun.tools.javac.Main;
+
+public class Jdbcpro6 {
+	String driver = "oracle.jdbc.OracleDriver";
+	String dburl = "jdbc:oracle:thin:@localhost:1521:orcl";
+	String dbUname = "DAMERA";
+	String dbUpwd = "ENJOY";
+	
+	Connection connect(){
+		Connection con = null;
+		
+		try {
+			Class.forName(driver);
+			con = DriverManager.getConnection(dburl, dbUname, dbUpwd);
+	
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		return con;
+	}
+	public void m1() {
+		try {
+			Connection con = connect();
+			Statement stat = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_READ_ONLY);
+			ResultSet rs = stat.executeQuery("select * from EMPLOYEE");
+			
+			while(rs.next()) {
+				IO.println(rs.getString(1)+" "+rs.getString(2)+" "+rs.getString(3)+" "+rs.getInt(4));
+			}
+			IO.println();
+			while(rs.previous()) {
+				IO.println(rs.getString(1)+" "+rs.getString(2)+" "+rs.getString(3)+" "+rs.getInt(4));
+			}
+			IO.println();
+			if(rs.last()) {
+				IO.println(rs.getString(1)+" "+rs.getString(2)+" "+rs.getString(3)+" "+rs.getInt(4));				
+			}
+			IO.println();
+			if(rs.first()) {
+				IO.println(rs.getString(1)+" "+rs.getString(2)+" "+rs.getString(3)+" "+rs.getInt(4));				
+			}
+			IO.println();
+			rs.afterLast();
+			while(rs.previous()) {
+				IO.println(rs.getString(1)+" "+rs.getString(2)+" "+rs.getString(3)+" "+rs.getInt(4));
+			}
+			IO.println();
+			rs.beforeFirst();
+			while(rs.next()) {
+				IO.println(rs.getString(1)+" "+rs.getString(2)+" "+rs.getString(3)+" "+rs.getInt(4));
+			}
+			IO.println();
+			if(rs.absolute(2)) {
+				IO.println(rs.getString(1)+" "+rs.getString(2)+" "+rs.getString(3)+" "+rs.getInt(4));
+			}
+			IO.println();
+			if(rs.relative(2)) {
+				IO.println(rs.getString(1)+" "+rs.getString(2)+" "+rs.getString(3)+" "+rs.getInt(4));
+			}
+			IO.println();
+			if(rs.absolute(-2)) {
+				IO.println(rs.getString(1)+" "+rs.getString(2)+" "+rs.getString(3)+" "+rs.getInt(4));
+			}
+			IO.println();
+			if(rs.relative(-2)) {
+				IO.println(rs.getString(1)+" "+rs.getString(2)+" "+rs.getString(3)+" "+rs.getInt(4));
+			}
+			
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+	}
+	public static void main(String[] args) {
+		Jdbcpro6 pr = new Jdbcpro6();
+		pr.m1();
+	}
+}

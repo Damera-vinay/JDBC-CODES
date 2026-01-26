@@ -1,0 +1,97 @@
+package com.pack1;
+
+import java.awt.Window.Type;
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.Types;
+import java.util.Scanner;
+
+public class Jdbcpro8 {
+   String driver = "oracle.jdbc.OracleDriver";
+   String url ="jdbc:oracle:thin:@localhost:1521:orcl";
+   String dbUname = "DAMERA";
+   String dbupwd = "ENJOY";
+   
+   Scanner sc = new Scanner(System.in);
+   
+   void math1() {
+	   IO.println("Implemting callable Statenent");
+	   try {
+		   Class.forName(driver);
+		   Connection con = DriverManager.getConnection(url,dbUname,dbupwd);
+		   CallableStatement cstat = con.prepareCall("{call InsertData(?,?,?,?,?)}");
+		   
+		   String id = IO.readln("Enter id :");
+		   String name = IO.readln("Enter name :");
+		   String desg = IO.readln("Enter designation :");
+		   int bsal = Integer.parseInt(IO.readln("Enter basic salary"));
+		   
+		   float tsal = (bsal+(0.35f*bsal)+(0.15f*bsal));
+		   cstat.setString(1, id);
+		   cstat.setString(2, name);
+		   cstat.setString(3, desg);
+		   cstat.setInt(4, bsal);
+		   cstat.setFloat(5, tsal);
+		   cstat.execute();
+		   
+		   IO.println("Data inserted");
+		   
+	   }
+	   catch (Exception e) {
+	     e.printStackTrace();
+	}
+   }
+   void meth2() {
+	   IO.println("Implenting retrive data");
+	   try {
+		   Class.forName(driver);
+		   Connection con = DriverManager.getConnection(url,dbUname,dbupwd);
+		   CallableStatement cstat = con.prepareCall("{call ReteriveEmpdata(?,?,?,?,?)}");
+//		   IO.println("Enter emplyee id :");
+		   String e_id = IO.readln("Enter emplyee id :");
+		   cstat.setString(1, e_id);
+		   cstat.registerOutParameter(2, Types.VARCHAR);
+		   cstat.registerOutParameter(3, Types.VARCHAR);
+		   cstat.registerOutParameter(4, Types.NUMERIC);
+		   cstat.registerOutParameter(5, Types.NUMERIC);
+		   cstat.execute();
+		   IO.println("==============Employee details ================================");
+		   IO.println("Employee Id :"+e_id);
+		   IO.println("Employee name :"+cstat.getString(2));
+		   IO.println("Employee desg :"+cstat.getString(3));
+		   IO.println("Employee Basic salary "+cstat.getInt(4));
+		   IO.println("Employee total salary "+cstat.getInt(5));
+		   
+	   }
+	   catch(Exception e) {
+		   e.printStackTrace();
+	   }
+   }
+   void meth3() {
+	   IO.println("Implenting retrive data ===== function");
+	   try {
+		   Class.forName(driver);
+		   Connection con = DriverManager.getConnection(url,dbUname,dbupwd);
+		   CallableStatement cstat = con.prepareCall("{call ?:=RETERIVETSAL(?)}");
+		   String e_id = IO.readln("Enter employee id");
+		   cstat.setString(2, e_id);
+		   cstat.registerOutParameter(1, Types.NUMERIC);
+		   cstat.execute();
+		   IO.println("==============Employee details ================================");
+		   IO.println("Employee Id :"+e_id);
+		   IO.println("Employee name :"+cstat.getInt(1));
+           		   
+	   }catch(Exception e) {
+		   e.printStackTrace();
+	   }
+   }
+   public static void main(String[] args) {
+	Jdbcpro8 cal = new Jdbcpro8();
+//	cal.math1();
+	cal.meth2();
+	cal.meth3();
+}
+	
+	
+}

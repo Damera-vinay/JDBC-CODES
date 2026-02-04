@@ -1,0 +1,136 @@
+package com.pack1;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
+
+public class AssignmentPro {
+
+	
+	String driver = "oracle.jdbc.OracleDriver";
+	String url ="jdbc:oracle:thin:@localhost:1521:orcl";
+	String dbUname = "DAMERA";
+	String dbupwd = "ENJOY";
+	String query1 = "select * from food";
+	String query2 = "select FOOD_NAME, PRICE from food where food_id = ?";
+    String query3 =	"INSERT INTO orders (order_id, food_id, quantity, total_price) VALUES (ORDER_SEQ.NEXTVAL, ?, ?, ?)";	
+    String query4 = "SELECT order_id, food_id, quantity, total_price FROM orders";
+	
+
+	Connection connect() {
+		Connection con = null;
+		try {
+			Class.forName(driver);
+			con = DriverManager.getConnection(url,dbUname,dbupwd);
+			
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+		return con;
+			
+	}
+	
+	void displyMenu() {
+			IO.println("All the food items menu.");
+			IO.println("------------------------");
+		try {
+			Connection con = connect();
+		    Statement stat = con.createStatement();
+		    ResultSet rs = stat.executeQuery(query1);
+		    while(rs.next()) {
+		    	IO.println(rs.getInt(1)+" " +rs.getString(2)+" "+rs.getInt(3));
+		    }
+		    
+		}
+		catch (Exception e) {
+		e.printStackTrace();
+		}
+	}
+	void AskUser() {
+		
+		IO.println("Customer entring customer ");
+		try {
+			Connection con = connect();
+		    int fid = Integer.parseInt(IO.readln("Enter order id :"));
+		    int quantity = Integer.parseInt(IO.readln("Enter order quantity :"));
+		    
+
+		    PreparedStatement pstmt = con.prepareStatement(query2);
+		    pstmt.setInt(1, fid);
+		    
+		    ResultSet rs = pstmt.executeQuery();
+		    if(rs.next()) {
+		    	
+		    	String fname = rs.getString("FOOD_NAME");
+		    	int price =rs.getInt("price");
+		    	int totalprice = price * quantity;
+		    	
+		    	IO.println("food name "+fname);
+		    	IO.println("Quntity of food "+quantity);
+		    	IO.println("Total price is "+totalprice);
+		    	
+		    
+		    		IO.println("Inserting the values in the data base");
+		    		
+		    			
+		    			
+		    			PreparedStatement pstmt2 = con.prepareStatement(query3);
+		    			int Orderid = Integer.parseInt(IO.readln("enter order ID :"));
+		    			
+		    			pstmt2.setInt(1, Orderid);
+		    			pstmt2.setInt(2, fid);
+		    			pstmt2.setInt(3,quantity);
+		    			pstmt2.setInt(4, totalprice);
+		    			
+		    			int rows = pstmt2.executeUpdate();
+		    			
+		    			if(rows>0) {
+		    				IO.println("Order added succefully.");
+		    				
+		    			}
+		    			pstmt2.close();
+		    }
+		    else {
+		    	IO.println("invalid data not found");
+		    	
+		    }
+	   
+		}
+		catch (Exception e) {
+			
+		e.printStackTrace();
+		}
+		
+	}
+	void shoeAllData() {
+		IO.println("-----------All ORDERS-----------");
+		try {
+			Connection con = connect();
+			PreparedStatement pstat = con.prepareStatement(query4);
+			ResultSet rs = pstat.executeQuery();
+			while(rs.next()) {
+				 IO.println("Order ID   : " + rs.getInt("order_id") +
+                 "\nFood ID    : " + rs.getInt("food_id") +
+                 "\nQuntity   : " + rs.getInt("quantity") +
+                 "\nTotal Price: " + rs.getInt("total_price") +
+                 "\n-----------------------------");
+                 }
+			
+			
+			
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	void main() {
+		AssignmentPro as = new AssignmentPro();
+//		as.displyMenu();
+//		as.AskUser();
+		as.shoeAllData();
+	}
+	
+}
